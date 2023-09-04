@@ -51,14 +51,20 @@ def publish_state(dev):
 		numstr = ' '.join(str(x) for x in nums)
 		client.publish(f'cmnd/{dev}/comptimer', numstr)
 	elif state == 'NMBRS':
-		nums = bigtimer_state[5:9]
+		nums = []
 		colors = []
 
 		for i in range(4):
-			c = bigtimer_state[9 + 6 * i:9 + 6 * (i + 1)]
+			d = bigtimer_state[5 + 2 * i:5 + 2 * (i + 1)]
+			nums.append(struct.unpack('<B', bytes.fromhex(d))[0])
+
+		for i in range(4):
+			c = bigtimer_state[13 + 6 * i:13 + 6 * (i + 1)]
+			c = c[4:] + c[2:4] + c[:2]
 			colors.append(c)
 
-		d_str = nums + ' ' + ' '.join(x for x in colors)
+		numstr = ''.join(str(x) for x in nums)
+		d_str = numstr + ' ' + ' '.join(x for x in colors)
 		client.publish(f'cmnd/{dev}/numbers', d_str)
 
 def bigtimer_listener(ev):
